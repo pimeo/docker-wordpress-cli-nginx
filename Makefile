@@ -20,3 +20,9 @@ clean: down
 	@rm -rf  wordpress/*
 
 reset: clean
+
+generate_http_conf:
+	orbit run generate_nginx_http_conf
+
+generate_https_conf:
+	orbit run generate_nginx_https_conf
