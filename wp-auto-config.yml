@@ -18,7 +18,7 @@ services:
       - mariadb
     environment:
       # Waiting for MySQL and wordpress -------------------
-      - WAIT_HOSTS=mariadb:3306,wordpress:80
+      - WAIT_HOSTS=mariadb:3306,wordpress:9000
       # - WAIT_HOSTS=mariadb:3306,wordpress443
       - WAIT_BEFORE=${WAIT_BEFORE_HOSTS:-30}
       - WAIT_AFTER=${WAIT_AFTER_HOSTS:-15}
