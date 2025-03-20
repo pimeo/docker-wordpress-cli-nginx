@@ -18,8 +18,10 @@ server {
 }
 
 server {
-        listen 443 ssl http2;
-        listen [::]:443 ssl http2;
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        http2  on;
+
         # server_name {{ .Orbit.Values.WORDPRESS_HOST_DOMAIN }} www.{{ .Orbit.Values.WORDPRESS_HOST_DOMAIN }};
         server_name {{ .Orbit.Values.WORDPRESS_HOST_DOMAIN }};
 
