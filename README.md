@@ -1,4 +1,4 @@
-- [Alpcloud Docker Wordpress Nginx](#alpcloud-docker-wordpress-nginx)
+- [Custom Docker Wordpress CLI Nginx](#custom-docker-wordpress-cli-nginx)
   - [Goals:](#goals)
   - [Requirements](#requirements)
     - [Install Orbit](#install-orbit)
@@ -8,11 +8,10 @@
     - [Installation conditions](#installation-conditions)
   - [Start application](#start-application)
   - [Destroy application (at your own risks)](#destroy-application-at-your-own-risks)
-  - [A big thank to posts and projects](#a-big-thank-to-posts-and-projects)
+  - [Many thanks to posts and projects](#many-thanks-to-posts-and-projects)
 
-# Alpcloud Docker Wordpress Nginx
+# Custom Docker Wordpress CLI Nginx
 - Created At: 03/20/2025
-- Created By: bsu <bertrand.souriau@gmail.com>
 - Version: 0.1.0
 
 ## Goals: 
@@ -41,9 +40,9 @@ sudo apt install build-essential
 ### Full sample of commands to install the application without http support
 
 ```sh
-cd /home/bsu && mkdir alpcloud && cd alpcloud
-git clone ssh://git@gitlab.sixbleuets.ovh:2424/paas-alpcloud/alpcloud-docker-wordpress-nginx.git my-alpcloud-project 
-cd my-alpcloud-project
+cd /home/laptop && mkdir wp && cd wp
+git clone https://github.com/pimeo/docker-wordpress-cli-nginx.git my-wp-project 
+cd my-wp-project
 cp .example.env .env # Fill in with you environments values
 nano .env
 make generate_http_conf # Generate a nginx http conf. Required to start a server to request the let's encrypt certificate.
@@ -64,9 +63,9 @@ Il y aura 2 possibilités de déployer le projet dans ce cas:
 ### Full sample commands to install the application with https support
 
 ```sh
-cd /home/bsu && mkdir alpcloud && cd alpcloud
-git clone ssh://git@gitlab.sixbleuets.ovh:2424/paas-alpcloud/alpcloud-docker-wordpress-nginx.git my-alpcloud-project 
-cd my-alpcloud-project
+cd /home/laptop && mkdir wp && cd wp
+git clone https://github.com/pimeo/docker-wordpress-cli-nginx.git my-wp-project 
+cd my-wp-project
 cp .example.env .env # Fill in with you environments values
 nano .env
 make generate_http_conf # Generate a nginx http conf. Required to start a server to request the let's encrypt certificate.
@@ -96,9 +95,9 @@ make start
 make destroy
 ```
 
-Be careful, it deletes everything ..!
+Be careful, it deletes everything..!
 
-## A big thank to posts and projects
+## Many thanks to posts and projects
 - https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-docker-compose
 - https://github.com/gulien/orbit?tab=readme-ov-file
 - https://github.com/thecodingmachine/docker-images-php/blob/v4/utils/Dockerfile.slim.blueprint
