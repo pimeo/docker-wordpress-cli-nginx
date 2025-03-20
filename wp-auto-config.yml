@@ -3,6 +3,7 @@ services:
   # depends on wp-cli build
   wp-auto-config:
     # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
+    image: wpcli
     build:
       context: ./wpcli/
       args:
