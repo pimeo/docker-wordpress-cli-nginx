@@ -2,7 +2,7 @@ services:
   # Wordpress auto configuration
   # depends on wp-cli build
   wp-auto-config:
-    image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
+    # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
     build: ./wpcli/
     container_name: ${COMPOSE_PROJECT_NAME}_wp_autoconfig
     entrypoint: sh -c "/wait && make -f /scripts/Makefile"
