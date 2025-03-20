@@ -2,7 +2,7 @@ services:
   # Wordpress auto configuration
   # depends on wp-cli build
   wp-auto-config:
-    image: wpcli
+    image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
     build: ./wpcli/
     container_name: ${COMPOSE_PROJECT_NAME}_wp_autoconfig
     entrypoint: sh -c "/wait && make -f /scripts/Makefile"
@@ -15,6 +15,7 @@ services:
     environment:
       # Waiting for MySQL and wordpress -------------------
       - WAIT_HOSTS=mariadb:3306,wordpress:80
+      # - WAIT_HOSTS=mariadb:3306,wordpress443
       - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
       - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
       - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}

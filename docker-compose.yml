@@ -109,6 +109,7 @@ services:
     command: sh -c "/wait"
     environment:
       - WAIT_HOSTS=mariadb:3306, wordpress:80
+      # - WAIT_HOSTS=mariadb:3306, wordpress:443
       - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
       - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
       - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
