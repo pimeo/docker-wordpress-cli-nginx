@@ -28,10 +28,10 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - "WORDPRESS_DB_HOST=alpcloud_docker_wordpress_nginx_db:${MARIADB_PORT}"
+      - "WORDPRESS_DB_HOST=${MARIADB_HOST}:${MARIADB_PORT}"
       - "WORDPRESS_DB_USER=${MARIADB_USER}"
       - "WORDPRESS_DB_PASSWORD=${MARIADB_PASSWORD}"
-      - "WORDPRESS_DB_NAME=${MARIADB_NAME}"
+      - "WORDPRESS_DB_NAME=${MARIADB_DATABASE}"
     volumes:
       - "wordpress:/var/www/html"
     networks:
@@ -62,8 +62,12 @@ services:
     volumes:
       - certbot-etc:/etc/letsencrypt
       - wordpress:/var/www/html
-    # command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d your_domain -d www.your_domain
-    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d ${WORDPRESS_HOST_DOMAIN}
+    # with staging mode and support www subdomain
+    # command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d ${WORDPRESS_HOST_DOMAIN} -d www.${WORDPRESS_HOST_DOMAIN}
+    # with staging flag (test mode)
+    # command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d ${WORDPRESS_HOST_DOMAIN}
+    # without staging flag (production mode)
+    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -d ${WORDPRESS_HOST_DOMAIN}
 
 volumes:
   mariadb_data:
