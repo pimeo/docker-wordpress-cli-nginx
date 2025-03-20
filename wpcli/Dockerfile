@@ -1,4 +1,5 @@
-FROM wordpress:cli
+ARG WORDPRESS_CLI_VERSION=cli
+FROM wordpress:${WORDPRESS_CLI_VERSION}
 
 # Install make tool
 USER root

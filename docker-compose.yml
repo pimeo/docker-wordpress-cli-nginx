@@ -92,8 +92,11 @@ services:
 
   # Command line interface to wordpress
   wpcli:
-    build: ./wpcli/
     # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
+    build: 
+      context: ./wpcli/
+      args:
+        - "WORDPRESS_CLI_VERSION=${WORDPRESS_CLI_VERSION}"
     container_name: ${COMPOSE_PROJECT_NAME}_wpcli
     volumes:
       - ${WORDPRESS_DATA_DIR:-./wordpress}:/var/www/html
@@ -104,7 +107,10 @@ services:
 # Check availability of essential services
   healthcheck:
     # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
-    build: ./wpcli/
+    build: 
+      context: ./wpcli/
+      args:
+        - "WORDPRESS_CLI_VERSION=${WORDPRESS_CLI_VERSION}"
     container_name: ${COMPOSE_PROJECT_NAME}_healthcheck
     command: sh -c "/wait"
     environment:
