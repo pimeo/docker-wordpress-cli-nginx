@@ -93,6 +93,10 @@ services:
   # Command line interface to wordpress
   wpcli:
     # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
+    mariadb:
+      condition: service_healthy
+    wordpress:
+      condition: service_started
     build: 
       context: ./wpcli/
       args:
