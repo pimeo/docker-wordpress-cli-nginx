@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: APACHE-2.0
+# Reference: https://github.com/bitnami/containers/tree/main/bitnami/wordpress-nginx
+
+services:
+  mariadb:
+    container_name: alpcloud_docker_wordpress_nginx_db
+    image: docker.io/bitnami/mariadb:11.4
+    restart: unless-stopped
+    volumes:
+      - 'mariadb_data:/bitnami/mariadb'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=no
+    env_file: .env
+    healthcheck:
+      test: ['CMD', '/opt/bitnami/scripts/mariadb/healthcheck.sh']
+      interval: 15s
+      timeout: 5s
+      retries: 6
+    networks:
+      - app-network
+
+  wordpress:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    image: wordpress:6.7.2-fpm-alpine
+    container_name: alpcloud_docker_wordpress_nginx_wordpress
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - "WORDPRESS_DB_HOST=alpcloud_docker_wordpress_nginx_db:${MARIADB_PORT}"
+      - "WORDPRESS_DB_USER=${MARIADB_USER}"
+      - "WORDPRESS_DB_PASSWORD=${MARIADB_PASSWORD}"
+      - "WORDPRESS_DB_NAME=${MARIADB_NAME}"
+    volumes:
+      - "wordpress:/var/www/html"
+    networks:
+      - app-network
+
+  webserver:
+    depends_on:
+      - wordpress
+    image: nginx:1.27.4-alpine
+    container_name: alpcloud_docker_wordpress_nginx_webserver
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+    volumes:
+      - "wordpress:/var/www/html"
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+    networks:
+      - app-network
+  
+  certbot:
+    depends_on:
+      - webserver
+    image: certbot/certbot
+    container_name: alpcloud_docker_wordpress_nginx_certbot
+    env_file: .env
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - wordpress:/var/www/html
+    # command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d your_domain -d www.your_domain
+    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d ${WORDPRESS_HOST_DOMAIN}
+
+volumes:
+  mariadb_data:
+  wordpress:
+  certbot-etc:
+
+networks:
+  app-network:
+    driver: bridge
