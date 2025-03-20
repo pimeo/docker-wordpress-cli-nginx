@@ -3,8 +3,8 @@
 
 services:
   mariadb:
-    container_name: alpcloud_docker_wordpress_nginx_db
-    image: docker.io/bitnami/mariadb:11.4
+    container_name: ${COMPOSE_PROJECT_NAME}_mariadb
+    image: docker.io/bitnami/mariadb:${MARIADB_VERSION:-latest}
     restart: unless-stopped
     volumes:
       - 'mariadb_data:/bitnami/mariadb'
@@ -23,8 +23,10 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    image: wordpress:6.7.2-fpm-alpine
-    container_name: alpcloud_docker_wordpress_nginx_wordpress
+      phpmyadmin:
+        condition: service_started
+    image: wordpress:${WORDPRESS_VERSION:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME}_wordpress
     restart: unless-stopped
     env_file: .env
     environment:
@@ -33,36 +35,54 @@ services:
       - "WORDPRESS_DB_PASSWORD=${MARIADB_PASSWORD}"
       - "WORDPRESS_DB_NAME=${MARIADB_DATABASE}"
     volumes:
-      - "wordpress:/var/www/html"
+      # - wordpress:/var/www/html
+      - ${WORDPRESS_DATA_DIR:-./wordpress}:/var/www/html
     networks:
       - app-network
 
   webserver:
     depends_on:
       - wordpress
-    image: nginx:1.27.4-alpine
-    container_name: alpcloud_docker_wordpress_nginx_webserver
+    image: nginx:${NGINX_VERSION:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME}_webserver
     restart: unless-stopped
     env_file: .env
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - "wordpress:/var/www/html"
+      # - "wordpress:/var/www/html"
+      - ${WORDPRESS_DATA_DIR:-./wordpress}:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
+    networks:
+      - app-network
+
+  phpmyadmin:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    image: phpmyadmin/phpmyadmin:${PHPMYADMIN_VERSION:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
+    restart: always
+    ports:
+      - ${PHPMYADMIN_PORT}:80
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-password}
     networks:
       - app-network
   
   certbot:
     depends_on:
       - webserver
-    image: certbot/certbot
-    container_name: alpcloud_docker_wordpress_nginx_certbot
+    image: certbot/certbot:${CERTBOT_VERSION:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME}_certbot
     env_file: .env
     volumes:
       - certbot-etc:/etc/letsencrypt
-      - wordpress:/var/www/html
+      # - wordpress:/var/www/html
+      - ${WORDPRESS_DATA_DIR:-./wordpress}:/var/www/html
     # with staging mode and support www subdomain
     # command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --staging -d ${WORDPRESS_HOST_DOMAIN} -d www.${WORDPRESS_HOST_DOMAIN}
     # with staging flag (test mode)
@@ -70,9 +90,36 @@ services:
     # without staging flag (production mode)
     command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -d ${WORDPRESS_HOST_DOMAIN}
 
+  # Command line interface to wordpress
+  wpcli:
+    build: ./wpcli/
+    image: wpcli
+    container_name: ${COMPOSE_PROJECT_NAME}_wpcli
+    volumes:
+      - ${WORDPRESS_DATA_DIR:-./wordpress}:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - app-network
+
+# Check availability of essential services
+  healthcheck:
+    image: wpcli
+    build: ./wpcli/
+    container_name: ${COMPOSE_PROJECT_NAME}_healthcheck
+    command: sh -c "/wait"
+    environment:
+      - WAIT_HOSTS=mariadb:3306, wordpress:80
+      - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
+      - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
+      - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
+      - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL:-30}
+      - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT:-30}
+    networks:
+      - app-network
+
 volumes:
   mariadb_data:
-  wordpress:
+  # wordpress:
   certbot-etc:
 
 networks:
