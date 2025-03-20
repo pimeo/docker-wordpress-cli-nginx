@@ -21,6 +21,10 @@ clean: down
 
 reset: clean
 
+destroy: clean
+	@echo "💥 Removing related folders/files, docker containers, networks and volumes"
+	docker compose rm --all --volumes
+
 generate_http_conf:
 	orbit run generate_nginx_http_conf
 
