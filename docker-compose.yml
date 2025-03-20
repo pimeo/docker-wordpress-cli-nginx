@@ -108,7 +108,7 @@ services:
     networks:
       - app-network
 
-# Check availability of essential services
+  # Check availability of essential services
   healthcheck:
     # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
     build: 
@@ -119,10 +119,9 @@ services:
     command: sh -c "/wait"
     environment:
       - WAIT_HOSTS=mariadb:3306, wordpress:80
-      # - WAIT_HOSTS=mariadb:3306, wordpress:443
-      - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
-      - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
-      - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
+      - WAIT_BEFORE=${WAIT_BEFORE_HOSTS:-30}
+      - WAIT_AFTER=${WAIT_AFTER_HOSTS:-15}
+      - WAIT_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
       - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL:-30}
       - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT:-30}
     networks:

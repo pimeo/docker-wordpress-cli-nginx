@@ -3,7 +3,7 @@ services:
   # depends on wp-cli build
   wp-auto-config:
     # image: wordpress:${WORDPRESS_CLI_VERSION:-cli}
-    build: 
+    build:
       context: ./wpcli/
       args:
         - "WORDPRESS_CLI_VERSION=${WORDPRESS_CLI_VERSION}"
@@ -19,9 +19,9 @@ services:
       # Waiting for MySQL and wordpress -------------------
       - WAIT_HOSTS=mariadb:3306,wordpress:80
       # - WAIT_HOSTS=mariadb:3306,wordpress443
-      - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
-      - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
-      - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
+      - WAIT_BEFORE=${WAIT_BEFORE_HOSTS:-30}
+      - WAIT_AFTER=${WAIT_AFTER_HOSTS:-15}
+      - WAIT_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
       - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL:-30}
       - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT:-30}
       # Wordpress configuration -----------------------------
